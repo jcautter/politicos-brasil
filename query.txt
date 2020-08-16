@@ -1,0 +1,73 @@
+/* Cadidatos Origem */
+
+For docP in candidato
+    For docC in candidatura
+        FILTER
+            docP._id == docC._from
+            && docC.cargo != "PRESIDENTE"
+            && docC.uf IN ["RJ", "SP"]
+        COLLECT
+            ufC = docC.uf
+            ,ufN = docP.ufNascimento == docC.uf ? "igual" : "diferente"
+            /*,ufC = docC.uf*/
+            /*,abrangencia = docC.abrangencia*/
+            /*,cargo = docC.cargo*/
+        WITH
+            COUNT INTO qtd
+        RETURN
+            {
+            ufC
+            ,ufN
+            /*,abrangencia*/
+            /*,cargo*/
+            ,qtd
+            }
+
+
+/* Tabela de analise */
+
+For docP in candidato
+    For docC in candidatura
+        FILTER
+            docP._id == docC._from
+            && docC.cargo != "PRESIDENTE"
+            /*
+            && docC.uf IN ["RJ", "SP"]
+            && docP.grauInstrucao == "LÊ E ESCREVE"
+            */
+        LET
+            idade = DATE_YEAR(DATE_NOW()) - DATE_YEAR(docP.dataNascimento)
+        COLLECT
+            ufC = docC.uf
+            ,ufN = docP.ufNascimento == docC.uf ? "igual" : "diferente"
+            ,corRaca = docP.corRaca
+            ,genero = docP.genero
+            ,grauInstrucao = docP.grauInstrucao
+            /*,ufC = docC.uf*/
+            /*,abrangencia = docC.abrangencia*/
+            ,cargo = docC.cargo
+            ,anoCandidatura = DATE_YEAR(docC.dataEleicao)
+            ,faixaEtaria = idade <= 20 ? 20
+                : idade <= 25 ? 25
+                : idade <= 30 ? 30
+                : idade <= 35 ? 35
+                : idade <= 40 ? 40
+                : idade <= 45 ? 45
+                : idade <= 50 ? 50
+                : idade <= 55 ? 55
+                : idade <= 60 ? 60
+                : 65
+        WITH
+            COUNT INTO qtd
+        RETURN
+            {
+            ufC
+            ,ufN
+            ,corRaca
+            ,genero
+            ,grauInstrucao
+            ,qtd
+            ,cargo
+            ,anoCandidatura
+            ,faixaEtaria
+            }
